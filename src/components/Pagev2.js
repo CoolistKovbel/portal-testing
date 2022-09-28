@@ -7,8 +7,10 @@ function Pagev2({
   currentContractWaves,
   setContractCurrentWaves,
   currentUserWaves,
+  allMessages,
 }) {
   const [loadingHash, setLoadingHash] = useState(true);
+  const [message, setMessage] = useState("");
 
   const wave = async () => {
     try {
@@ -43,6 +45,36 @@ function Pagev2({
     }
   };
 
+  const sendMessage = async (_message) => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(
+          contractAddress,
+          abi.abi,
+          signer
+        );
+
+        let messageTxn = await wavePortalContract.message(_message);
+        console.log("mining message txn", messageTxn.hash);
+        await messageTxn.wait();
+      }
+    } catch (error) {}
+  };
+
+  const onChange = (e) => {
+    setMessage(e.target.value);
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    sendMessage(message);
+    setMessage("");
+  };
+
   return (
     <section className="pagev2">
       <header>
@@ -61,7 +93,34 @@ function Pagev2({
           </button>
           {!loadingHash ? <p>status: loading</p> : <p>status: idle</p>}
         </div>
+        <div className="message-test">
+          <form onSubmit={onSubmit}>
+            <label>Message</label>
+            <input type="text" onChange={onChange} value={message} />
+            <button className="test-button">send message</button>
+          </form>
+        </div>
       </div>
+      <table className="message-table">
+        <thead>
+          <tr>
+            <th>Address</th>
+            <th>Time</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          {allMessages.map((message, index) => {
+            return (
+              <tr key={index}>
+                <td>{message.address}</td>
+                <td>{message.timestamp.toString()}</td>
+                <td>{message.message}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </section>
   );
 }

@@ -10,8 +10,9 @@ export default function App() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [currentContractWaves, setContractCurrentWaves] = useState("");
   const [currentUserWaves, setCurrentUserWaves] = useState("");
+  const [allMessages, setAllMessages] = useState([]);
 
-  const contractAddress = "0xD2ef1123CA4008BFa9995052CAB5f950C42c9082";
+  const contractAddress = "0x3d95Bd39FA08d31C98e1aBC728C3d17b2fd0B45A";
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -29,7 +30,7 @@ export default function App() {
         const account = accounts[0];
         console.log("Found an account: ", account);
         setCurrentAccount(account);
-
+        await getAllMessages();
         const userWave = await getUserWaves(account);
         setCurrentUserWaves(userWave);
       } else {
@@ -107,6 +108,39 @@ export default function App() {
     }
   };
 
+  const getAllMessages = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(
+          contractAddress,
+          abi.abi,
+          signer
+        );
+
+        const messages = await wavePortalContract.getAllMessages();
+        console.log(messages);
+        let messagesCleaned = [];
+        messages.forEach((message) => {
+          messagesCleaned.push({
+            address: message.user,
+            timestamp: new Date(message.timestamp * 1000),
+            message: message.message,
+          });
+        });
+
+        setAllMessages(messagesCleaned);
+      } else {
+        console.log("Eth obj doesnt exist");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     checkIfWalletIsConnected();
   }, []);
@@ -121,6 +155,7 @@ export default function App() {
           currentContractWaves={currentContractWaves}
           setContractCurrentWaves={setContractCurrentWaves}
           currentUserWaves={currentUserWaves}
+          allMessages={allMessages}
         />
       ) : (
         <Pagev1 />
