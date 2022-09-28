@@ -28,6 +28,26 @@ export default function App() {
     }
   };
 
+  const connectWallet = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (!ethereum) {
+        alert("Download metamask HOE");
+        return;
+      }
+
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      console.log("Connected: ", accounts[0]);
+      setCurrentAccount(accounts[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const wave = () => {};
 
   useEffect(() => {
@@ -41,7 +61,9 @@ export default function App() {
         {currentAccount ? (
           <p>User Account: {currentAccount}</p>
         ) : (
-          <p>Connect account</p>
+          <button onClick={connectWallet} className="test-button">
+            Connect Account
+          </button>
         )}
       </header>
       <div className="test">
