@@ -8,6 +8,7 @@ import abi from "./utils/WavePortal.json";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState("");
+  const [currentContractWaves, setContractCurrentWaves] = useState("");
 
   const contractAddress = "0xD2ef1123CA4008BFa9995052CAB5f950C42c9082";
 
@@ -30,6 +31,9 @@ export default function App() {
       } else {
         console.log("No account found");
       }
+
+      const totalWave = await getContractTotalWaves();
+      setContractCurrentWaves(totalWave);
     } catch (error) {
       console.log(error);
     }
@@ -50,37 +54,28 @@ export default function App() {
 
       console.log("Connected: ", accounts[0]);
       setCurrentAccount(accounts[0]);
+
+      const totalWave = await getContractTotalWaves();
+      setContractCurrentWaves(totalWave);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const wave = async () => {
+  const getContractTotalWaves = async () => {
     try {
       const { ethereum } = window;
 
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const wavePortalContract = new ethers.Contract(
-          contractAddress,
-          abi.abi,
-          signer
-        );
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const wavePortalContract = new ethers.Contract(
+        contractAddress,
+        abi.abi,
+        signer
+      );
 
-        let count = await wavePortalContract.getTotalWaves();
-        console.log("Retrieve total wave count...", count.toNumber());
-
-        const waveTxn = await wavePortalContract.wave();
-
-        await waveTxn.wait();
-        console.log("mining...", waveTxn.hash);
-
-        count = await wavePortalContract.getTotalWaves();
-        console.log("Total waved: ", count.toNumber());
-      } else {
-        console.log("Ethereum object doesnt exist");
-      }
+      let count = await wavePortalContract.getTotalWaves();
+      return count.toNumber();
     } catch (error) {
       console.log(error);
     }
@@ -93,20 +88,16 @@ export default function App() {
   return (
     <div className="app">
       <Header currentAccount={currentAccount} connectWallet={connectWallet} />
-      {currentAccount ? <Pagev2 /> : <Pagev1 />}
+      {currentAccount ? (
+        <Pagev2
+          contractAddress={contractAddress}
+          abi={abi}
+          currentContractWaves={currentContractWaves}
+          setContractCurrentWaves={setContractCurrentWaves}
+        />
+      ) : (
+        <Pagev1 />
+      )}
     </div>
   );
-}
-
-{
-  /* <header className="mainHeader">
-<h2>Portal</h2>
-
-</header>
-<div className="test">
-<p>This is basically a small test to be able to send a wave</p>
-<button onClick={wave} className="test-button">
-  Wave
-</button>
-</div> */
 }
