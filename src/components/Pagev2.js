@@ -6,6 +6,7 @@ function Pagev2({
   abi,
   currentContractWaves,
   setContractCurrentWaves,
+  currentUserWaves,
 }) {
   const [loadingHash, setLoadingHash] = useState(true);
 
@@ -49,7 +50,7 @@ function Pagev2({
           Total Number Of Waves: <span>{currentContractWaves}</span>
         </h3>
         <h3>
-          Your current Waves: <span>111</span>
+          Your current Waves: <span>{currentUserWaves}</span>
         </h3>
       </header>
       <div className="test">

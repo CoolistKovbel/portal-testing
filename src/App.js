@@ -9,6 +9,7 @@ import abi from "./utils/WavePortal.json";
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [currentContractWaves, setContractCurrentWaves] = useState("");
+  const [currentUserWaves, setCurrentUserWaves] = useState("");
 
   const contractAddress = "0xD2ef1123CA4008BFa9995052CAB5f950C42c9082";
 
@@ -28,6 +29,9 @@ export default function App() {
         const account = accounts[0];
         console.log("Found an account: ", account);
         setCurrentAccount(account);
+
+        const userWave = await getUserWaves(account);
+        setCurrentUserWaves(userWave);
       } else {
         console.log("No account found");
       }
@@ -57,6 +61,9 @@ export default function App() {
 
       const totalWave = await getContractTotalWaves();
       setContractCurrentWaves(totalWave);
+
+      const userWave = await getUserWaves(accounts[0]);
+      setCurrentUserWaves(userWave);
     } catch (error) {
       console.log(error);
     }
@@ -81,6 +88,25 @@ export default function App() {
     }
   };
 
+  const getUserWaves = async (userAccount) => {
+    try {
+      const { ethereum } = window;
+
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const wavePortalContract = new ethers.Contract(
+        contractAddress,
+        abi.abi,
+        signer
+      );
+
+      let count = await wavePortalContract.getNumberOfWavesOfUser(userAccount);
+      return count.toNumber();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     checkIfWalletIsConnected();
   }, []);
@@ -94,6 +120,7 @@ export default function App() {
           abi={abi}
           currentContractWaves={currentContractWaves}
           setContractCurrentWaves={setContractCurrentWaves}
+          currentUserWaves={currentUserWaves}
         />
       ) : (
         <Pagev1 />
