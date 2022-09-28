@@ -1,6 +1,9 @@
 import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 import "./App.css";
+import Header from "./components/Header";
+import Pagev1 from "./components/Pagev1";
+import Pagev2 from "./components/Pagev2";
 import abi from "./utils/WavePortal.json";
 
 export default function App() {
@@ -89,22 +92,21 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="mainHeader">
-        <h2>Portal</h2>
-        {currentAccount ? (
-          <p>User Account: {currentAccount}</p>
-        ) : (
-          <button onClick={connectWallet} className="test-button">
-            Connect Account
-          </button>
-        )}
-      </header>
-      <div className="test">
-        <p>This is basically a small test to be able to send a wave</p>
-        <button onClick={wave} className="test-button">
-          Wave
-        </button>
-      </div>
+      <Header currentAccount={currentAccount} connectWallet={connectWallet} />
+      {currentAccount ? <Pagev2 /> : <Pagev1 />}
     </div>
   );
+}
+
+{
+  /* <header className="mainHeader">
+<h2>Portal</h2>
+
+</header>
+<div className="test">
+<p>This is basically a small test to be able to send a wave</p>
+<button onClick={wave} className="test-button">
+  Wave
+</button>
+</div> */
 }
