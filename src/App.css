@@ -1,0 +1,30 @@
+.app {
+  width: 100%;
+}
+
+.mainHeader{
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+}
+
+.mainHeader h2{
+  font-size: 2rem;
+}
+
+.test {
+  font-family: monospace;
+  color: orange;
+  text-align: center;
+}
+.test-button{
+  border: 2px dashed orange;
+  padding: 10px 12px;
+  font-size: 18px;
+  background-color: transparent;
+  color: firebrick;
+}
+.test-button:hover{
+  background-color: firebrick;
+  color: #fff;
+}
