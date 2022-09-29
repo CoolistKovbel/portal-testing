@@ -167,3 +167,34 @@
   color: dodgerblue;
   border: 1px solid orange;
 }
+
+@media(min-width: 360px ){
+  .mainHeader {
+    font-size: 12px;
+  }
+  .mainHeader nav {
+    width: 80px;
+  }
+  .test-button {
+    width: 100px;
+    font-size: 12px;
+    padding: 5px 6px;
+    justify-content: space-between;
+  }
+  .hero,
+  .features {
+    flex-direction: column-reverse;
+  }
+
+
+  .single-feature {
+    width: 100%;
+    margin-bottom: 14px;
+  }
+
+  .hero-image-container {
+    width: 100px;
+    height: 90px;
+  }
+
+}
