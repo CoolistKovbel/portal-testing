@@ -12,7 +12,7 @@ export default function App() {
   const [currentUserWaves, setCurrentUserWaves] = useState("");
   const [allMessages, setAllMessages] = useState([]);
 
-  const contractAddress = "0x3d95Bd39FA08d31C98e1aBC728C3d17b2fd0B45A";
+  const contractAddress = "0x6e9F7074b894D2AD7B8bb73B18250280BefC7cC5";
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -122,14 +122,13 @@ export default function App() {
         );
 
         const messages = await wavePortalContract.getAllMessages();
-        console.log(messages);
-        let messagesCleaned = [];
-        messages.forEach((message) => {
-          messagesCleaned.push({
+
+        let messagesCleaned = messages.map((message) => {
+          return {
             address: message.user,
             timestamp: new Date(message.timestamp * 1000),
             message: message.message,
-          });
+          };
         });
 
         setAllMessages(messagesCleaned);
@@ -143,6 +142,38 @@ export default function App() {
 
   useEffect(() => {
     checkIfWalletIsConnected();
+
+    let wavePortalContract;
+
+    const onNewMessage = (from, timestamp, message) => {
+      console.log("NewMessage", from, timestamp, message);
+      setAllMessages((prevState) => [
+        ...prevState,
+        {
+          address: from,
+          timestamp: new Date(timestamp * 1000),
+          message: message,
+        },
+      ]);
+    };
+
+    if (window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      wavePortalContract = new ethers.Contract(
+        contractAddress,
+        abi.abi,
+        signer
+      );
+      wavePortalContract.on("NewMessage", onNewMessage);
+    }
+
+    return () => {
+      if (wavePortalContract) {
+        wavePortalContract.off("NewMessage", onNewMessage);
+      }
+    };
   }, []);
 
   return (

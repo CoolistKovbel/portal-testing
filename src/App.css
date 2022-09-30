@@ -168,7 +168,12 @@
   border: 1px solid orange;
 }
 
-@media(min-width: 360px ){
+.message-table td {
+  padding: 10px;
+}
+
+
+@media(max-width: 500px ){
   .mainHeader {
     font-size: 12px;
   }

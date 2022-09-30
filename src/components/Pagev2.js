@@ -10,6 +10,7 @@ function Pagev2({
   allMessages,
 }) {
   const [loadingHash, setLoadingHash] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState(true);
   const [message, setMessage] = useState("");
 
   const wave = async () => {
@@ -28,7 +29,7 @@ function Pagev2({
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieve total wave count...", count.toNumber());
 
-        const waveTxn = await wavePortalContract.wave();
+        const waveTxn = await wavePortalContract.wave({ gasLimit: 300000 });
 
         setLoadingHash(false);
         await waveTxn.wait();
@@ -58,9 +59,13 @@ function Pagev2({
           signer
         );
 
-        let messageTxn = await wavePortalContract.message(_message);
+        let messageTxn = await wavePortalContract.message(_message, {
+          gasLimit: 300000,
+        });
+        setLoadingMessage(false);
         console.log("mining message txn", messageTxn.hash);
         await messageTxn.wait();
+        setLoadingMessage(true);
       }
     } catch (error) {}
   };
@@ -99,6 +104,7 @@ function Pagev2({
             <input type="text" onChange={onChange} value={message} />
             <button className="test-button">send message</button>
           </form>
+          {!loadingMessage ? <p>status: loading</p> : <p>status: idle</p>}
         </div>
       </div>
       <table className="message-table">
